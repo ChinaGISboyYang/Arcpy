@@ -1,0 +1,53 @@
+学习Arcpy，从零开始积累。
+1.代码注释：
+	python中，说明部分通常使用注释来实现：
+	方式: # 或者 ##  + 注释部分内容
+2. 模块导入：
+	方式： import 
+	Eg: import arcpy
+	      import os
+3.变量：（python中定义变量，不需要先声明变量类型，只需要直接命名和赋值即可）
+	Eg: mapsize = "22 x 34"
+4.内置数据类型：
+	4.1 String（字符串操作）：
+	“+” ： 连接字符串（Eg: Part = "D:\\Data\\polygon" + ".shp",输出Part：D：\Data\polygon.shp）
+	  "=="  : 判断是否相等（“=”是赋值运算符）
+	  python 的索引机制是以“0”开始的
+	  python中Path的引用：
+		Eg:PATH1 =  "D:/Data/Polygon/Cities.shp"
+		     PATH2 =  "D:\\Data\\Polygon\\Cities.shp"
+		     PATH3 =  "D:\Data\Polygon\Cities.shp"
+	4.2  数字（int, long, float, complex..）
+	4.3  列表（list,它是元素的有序集合，可以存放一种数据类型，也可以是多种数据类型（字符串，数字，其他列表，字典，对象等））
+	    切片功能；
+	    append（）在列表中添加新元素；
+	    sort（）对列表内容进行升序或者降序排列；
+	    insert （）在列表的任意位置插入元素；
+	    remove（）移除列表中第一个与参数匹配的项；
+	    reverse（）对列表中的内容进行反向排序；
+	    pop（）删除列表中的元素（默认是最后一个）并返回该元素的值。
+	4.5  元组（它是静态的，即创建后，不能添加也不能删除，也不能更改顺序）
+	4.6  字典（类似于列表，但字典是对象的无序集合，不能切片）
+	       Eg:  Dict = {Key1 : Value1, Key2 : Value2....}
+5. 类和对象：
+	Arcpy中，extent类是通过给出矩形左下角和右上角的地理坐标来指定的矩形。
+	     常见属性：XMin, XMax, YMin, YMax, spatialReference(存储对象空间参考系)...
+	     常用方法：（几何运算方法）contains（）（包含）； crosses（）（相交）； disjoint（）（不相交）； equals（）（相等）；overlaps（）（重叠）； touches（）（邻接）；within（）（包含于0）等
+6.python 的一些基本语句就不述了，很简单的。（if,for,try,while. ）值得一说的是： with语句
+	with语句：当有两个操作需要作为代码快中的一对操作来执行时，可以使用with语句。（常用于打开，读取和关闭文件，可以自动关闭文件或游标对象）
+
+   基础语法入门很快的，记住任何语言的要多看代码，多动手敲。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
