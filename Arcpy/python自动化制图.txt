@@ -1,0 +1,99 @@
+    python是一门很好的脚本编程语言，在ArcGis中充分利用其能力实现自动化制图功能，使很多制图员都想做到的事。
+Arcpy.mapping模块变为我们提供这样的功能。
+
+1.创建布局元素（python列表）
+    Eg: import arcpy.mapping as mapping
+          mxd = mapping.MapDocument("CURRENT") # 获取当前地图文档
+          for el in mapping.ListLayoutElements(mxd): #生成布局元素列表，如果name字段为空，就输出name
+	if el.name != '':
+	    print(el.name)
+2.如何维布局元素指定唯一的名称：
+    工作需求：需要用脚本访问并处理更改一个特定的元素时（例如更改公司标志的logo）；
+其实不需要在所有的地图文档中，手动一一的更改，编写一个地理处理脚本，可实现新图标程序化更改原地图文档中的logo。
+3.如何更新布局元素的属性：
+    需求：布局元素很多（图形，图例，文本，地图整饰，图片，标题等），在Mapping中，他们其实就是一个个的类，如何更改他们的属性？
+    Eg: import arcpy.mapping as mapping
+          mxd = mapping.MapDocument("CURRENT")
+          #  使用ListLayoutElement()函数，传入定义元素类型参数和通配符参数，即可返回含有“布局元素_name”的布局元素并将其存储在变量中
+          elLeg = mapping.Mapping.MapDocument(mxd, "LEGEND_ELEMENT", "*布局元素_name*")
+          elLeg.title = "更新后的内容"
+          #  获取部分布局元素的图层列表并输出其名称
+          for item in elLeg.listLegendItemLayers():
+	print(item.name)
+4.如何导出为PDF或者是图像文件：
+    Eg:  import arcpy.mapping as mapping
+          mxd = mapping.MapDocument("CURRENT")
+          for df in mapping.ListDataFrames(mxd):
+	if df.name == "数据框_name":
+	    df.referenceScale = df.scale
+	    mapping.ExportToPDF(mxd, r"导出文件路径")
+	    mapping.exportToJPEG(mxd, r"导出文件路径")
+5.如何导出报表？
+    报表：是Gis行业一种重要的成果展示数据，它包含：属性信息，地图，图片，图形和其他辅助信息。
+arcmap中有Report Wizard(报表向导)和Report Designer(报表设计器)
+    Eg:  import arcpy 
+           import os
+           path = os.getcwd()  # 获取当前工作目录
+           # 创建输出的PDF文件
+           pdfPath = path + r"\xxxreport.pdf"
+           if os.path.exists(pdfPath):
+	os.remove(pdfPath)
+           pdfDoc = arcpy.mapping.PDFDocumentCreate(pdfPath)
+           # 创建学区列表，通过遍历这个列表可以为每个地区创建报表
+           districtList = ["Harlandale", "East Central", "Edgewood", 
+	"Alamo Heights", "South San Antonio", "Southside", 
+	"Ft Sam Houston","North East", "Northside",
+	 "Lackland", "Southwest", "Judson", "San Antonio"]
+	# 引用地图文档，数据框和图层，并将其赋值给相应的变量
+         mxd = arcpy.mapping.MapDocument(path + r"\Crime_Ch4.mxd")
+         df = arcpy.mapping.ListDataFrames(mxd)[0]
+         lyr = arcpy.mapping.ListLayers(mxd, "Crime Density by School District")[0]
+         # 通过for循环，便利学校区域，并在循环内部使用whereClause变量定义查询表达式来显示单个学区
+         pageCount = 1
+         for district in districtList:
+              	#Generate image for each district
+              	whereClause = "\"NAME\" = '" + district + " ISD'"
+              	lyr.definitionQuery = whereClause
+             	 # 选择显示的单个学区，将数据库的范围设置为学区范围，并清除选择集
+             	arcpy.SelectLayerByAttribute_management(lyr, "NEW_SELECTION", whereClause)
+             	df.extent = lyr.getSelectedExtent()
+             	arcpy.SelectLayerByAttribute_management(lyr, "CLEAR_SELECTION")
+             	# 导出数据框为bitmap（.bmp）文件
+             	arcpy.mapping.ExportToBMP(mxd, path + "\DistrictPicture.bmp", df) #single file
+             	# 调用ExportReport（）函数生成报表
+            	#Generate report
+            	print("Generating report for: " + district + " ISD")
+            	arcpy.mapping.ExportReport(report_source=lyr,report_layout_file=path + r"\CrimeLayout.rlf",output_file=path + r"\temp" + str(pageCount) + ".pdf", starting_page_number=pageCount)
+　　     	# 追加报表为PDF文件
+            	#Append pages into final output
+            	print("Appending page: " + str(pageCount))
+            	pdfDoc.appendPages(path + r"\temp" + str(pageCount) + ".pdf")
+	# 删除临时的PDF报表
+            	os.remove(path + r"\temp" + str(pageCount) + ".pdf")
+            	pageCount = pageCount + 1
+      # 保存Pdf文档
+      pdfDoc.saveAndClose()
+      del mxd
+
+6. 将地图文档发布为ArcGIS Server 服务
+      总共需要三步：
+	一：调用Arcpy,mapping 中的CreateMapSDDraft（）函数，将地图文档（.mxd）转换成服务定义草稿文件（.sddraft),该文件是有一个地图文档，服务器信息和一组服务属性组合而成。
+		服务器信息包括：服务器连接，即将发布的服务类型，服务的元数据（项目信息）和数据参考（是否将数据复制到服务器）
+	二：调用StageServ Tool （.sd, 过度服务工具），编译能成功发布GIS资源所需的所有必要信息。
+	三：调用Upload Service Definition Tool（上传服务定义文件），并将器作为GIS服务发布到指定的GIS服务器。
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

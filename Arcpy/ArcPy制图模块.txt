@@ -1,0 +1,68 @@
+arcpy的mapping模块常见属性方法总结
+1.如何获取当前地图文档：
+	方式：mxd = mapping.MapDocument("CURRTENT")引用本地或者网络文档（arcpy.mapping.Document("文件路径")）
+2.如何获取当前图层的图层列表：
+	Eg:import arcpy.mapping as mapping
+	     mxd = mapping.MapDocument("CURRENT")
+	     layers = mapping.ListLayers(mxd)
+	     for lys in layers:
+		print(lys.name)
+3. 如何限制图层列表：
+	Eg: import arcpy.mapping as mapping
+	      mxd = mapping,.MapDocument("CURRENT")
+	      # 获取地图文档的数据框列表，搜索"数据框_name"的指定数据框
+	      for df in mapping.ListDataFrames(mxd):
+		if df.name =="数据框_name":
+		    layers = mapping.ListLayers(mxd, 'Burg*', df)
+	      # for 循环，输出地图文档中的每个图层名称
+		    for layer in layers:
+			print(layer.name)
+4.如何缩放到图层：
+	DataFrame.zoomToSelectedFeatures(): 缩放至所有选择要素的范围（来自数据框的所有图层）该方法就是缩放至所选要素
+	getSelectedExtent(): 该方法是Layer对象的，也是缩放至所选记录的范围。并且返回一个Extent（）对象，可以作为参数传给DataFeame.panToExtent()方法。
+	Eg:  import arcpy.mapping as mapping
+	       mxd = mapping.MapDocument("CURRENT")
+	       df = mapping.ListDataFrames(mxd,"数据框_name")[0]
+	       layer = mapping.ListLayers(mxd,"数据框中图层_name*",df)[0]
+	       df.extent = layer.getSelectedExtent()
+5.如何改变地图范围：
+	DataFrame 类的extent属性可以设置地图的范围
+	Eg: impot arcpy.mapping as mapping
+	      mxd = mapping.MapDocument("CURRENT")
+	      for df in mapping.ListDataFrames(mxd):
+		if df.name == '数据框_name':
+		    layers = mapping.ListLayers(mxd, '数据框中指定图层_name',df)
+		    for layer in layers:
+			query in layers:
+			 layer.definitionQuery = query
+			 df.extent = layer.getExtent()
+6.添加图层和插入图层：
+	添加图层：df = mapping.ListDataFremes(定义的地图文档量)[0]
+		 layer = mapping.Layer(r"引用图层文件.lyr文件的路径")
+		 mapping.AddLayer(df, layer, "AUTO_ARRANGE")
+	插入图层： df = mapping.ListDataFrames(mxd, "数据框_name")[0]
+		  refayer = mapping.Layers(mxd, "数据框中指定图层_name", df)[0]
+		  inseryLayer = mapping.Layer(r"待插入的图层路径")
+		  mappin.InsertLayer(df, refLayer, insertLayer, "BEFORE或者AFTER") 
+7.如何查找地图文档或者图层文件丢失的数据源：
+	Eg: mxd = mapping.mapDocument(r"地图文档的路径")
+	      listBrokenDS = mapping.ListBrokenDataSources(mxd) # 获取丢失数据源的图层列表
+	      for layer in listBrokenDS:
+		print(layer.name)
+8.使用MapDocument.findAndReplaceWorkspacePaths()查找全局，用以查找丢失的数据源：
+	mxd.findAndReplaceWorkspacePaths(r"数据源路径1", r"数据源路径2")
+	mxd.saveAcopy(r"保存地图文档路径")
+	拓展：MapDocument.replaceWorkspacex()类似上法，本方法不允许用户从一种工作空间类型转换成另一种工作空间（上法则可以）
+	      
+
+
+
+
+
+
+
+
+
+
+
+
